@@ -70,10 +70,10 @@ class CharInfo extends Component {
 
 const View = ({char}) => {
     const {name, description, homepage, wiki, thumbnail, comics} = char
-    const newDesc = beautifulDesc(description)
+    const newDesc = beautifulDesc(description)  //Если описание слишком длинное мы его обрезаем
     return (
         <>
-        <div className="char__basics">
+        <div className="char__basics"> 
                     <img style={beautifulImg(thumbnail)} src={thumbnail} alt="abyss"/>
                     <div>
                         <div className="char__info-name">{name}</div>

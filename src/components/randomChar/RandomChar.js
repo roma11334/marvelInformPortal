@@ -80,6 +80,7 @@ const beautifulDesc = (str) => {
     return str
 }
 
+//Есть проблема когда нет картинки эта заглушка плохо ложиться и приходиться менять стили)
 const beautifulImg = (img) => {
     if(img === 'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg'){
         return {
