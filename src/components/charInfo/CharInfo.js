@@ -1,5 +1,4 @@
 import './charInfo.scss';
-import thor from '../../resources/img/thor.jpeg';
 import { Component } from 'react';
 import MarvelService from '../../services/MarvelService';
 import ErrorMessage from '../errorMessage/errorMesage';
@@ -36,6 +35,7 @@ class CharInfo extends Component {
         if (prevProps.charId !== this.props.charId){
             this.updateChar()
         }
+        
         
     }
 
