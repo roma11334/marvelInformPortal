@@ -10,20 +10,43 @@ class CharList extends Component {
   state = {
     char: [],
     error: null,
-    spinner: true
+    spinner: true,
+    offset: 1550,
+    newItem: false,
+    charEnded: false
   };
 
+  marvelService = new MarvelService();
+
   componentDidMount() {
+    this.onUpdateChar()
+  }
+
+  onUpdateChar = (offset) => {
+    this.setState({newItem:true})
     this.marvelService
-        .getAllCharacters()
+        .getAllCharacters(offset)
         .then(this.onCharLoaded)
         .catch(this.onErrorLoaded)
   }
 
-  marvelService = new MarvelService();
+  // onUpdateLoaded = (char) => {
+  //   this.setState({
+  //     char: [...this.state.char, ...char]
+  //   })
+  //   console.log(this.state.char)
+  // }
 
-  onCharLoaded = (char) => {
-    this.setState({ char, spinner:null });
+  onCharLoaded = (newChar) => {
+    if(newChar.length < 9){
+      this.setState({charEnded:true})
+    }
+    this.setState(({char, offset}) => ({
+      char:[...char, ...newChar],
+      spinner: null,
+      newItem: false,
+      offset: offset + 9
+    }));
   };
 
   onErrorLoaded = (error) => {
@@ -31,7 +54,7 @@ class CharList extends Component {
   }
 
   list = () => {
-    const {char} = this.state
+    const {char, offset, newItem, charEnded} = this.state
     return (
       <div className="char__list">
           <ul className="char__grid">
@@ -44,7 +67,7 @@ class CharList extends Component {
                   )
               } )}
           </ul>
-          <button className="button button__main button__long">
+          <button style={{'display': charEnded ? 'none' : 'block'}} disabled={newItem} onClick={() => this.onUpdateChar(offset)} className="button button__main button__long">
             <div className="inner">load more</div>
           </button>
         </div>
@@ -53,7 +76,7 @@ class CharList extends Component {
 
   render() {
     
-    const { char, error, spinner } = this.state;
+    const { error, spinner } = this.state;
     const newList = this.list()
     const errorMes = error ? <ErrorMessage/> : null
     const spinnerMes = spinner ? <Spinner/> : null
