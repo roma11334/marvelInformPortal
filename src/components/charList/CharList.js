@@ -17,6 +17,19 @@ class CharList extends Component {
   };
 
   marvelService = new MarvelService();
+  myRef = []
+
+  setRef = elem => {
+    this.myRef.push(elem)
+  }
+
+  onSetRef = (i) => {
+    console.log(this.myRef)
+    this.myRef.forEach(item => {
+      item.classList.remove('char__item_selected')
+    })
+    this.myRef[i].classList.add('char__item_selected')
+  }
 
   componentDidMount() {
     this.onUpdateChar()
@@ -29,13 +42,6 @@ class CharList extends Component {
         .then(this.onCharLoaded)
         .catch(this.onErrorLoaded)
   }
-
-  // onUpdateLoaded = (char) => {
-  //   this.setState({
-  //     char: [...this.state.char, ...char]
-  //   })
-  //   console.log(this.state.char)
-  // }
 
   onCharLoaded = (newChar) => {
     if(newChar.length < 9){
@@ -58,9 +64,16 @@ class CharList extends Component {
     return (
       <div className="char__list">
           <ul className="char__grid">
-              {char.map(item =>{
+              {char.map((item,i) =>{
                   return(
-                      <li key={item.id} onClick={() => this.props.onCharSelected(item.id)} className="char__item">
+                      <li
+                      ref = {this.setRef} 
+                      key={item.id} 
+                      onClick={() => {
+                        this.props.onCharSelected(item.id)
+                        this.onSetRef(i)
+                      } } 
+                      className="char__item">
                           <img  src={item.thumbnail} alt="abyss" style={beautifulImg(item.thumbnail)} />
                           <div className="char__name">{item.name}</div>
                       </li>

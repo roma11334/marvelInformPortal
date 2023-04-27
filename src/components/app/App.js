@@ -5,6 +5,7 @@ import CharInfo from "../charInfo/CharInfo";
 import decoration from '../../resources/img/vision.png';
 import { Component } from "react";
 import ErrorBoundary from "../errorBoundary/ErrorBoundary";
+import PropTypes from 'prop-types';
 
 class App extends Component {
     state = {
@@ -35,5 +36,10 @@ class App extends Component {
         )
     }
 }
+
+App.propTypes = {
+    onCharSelected: PropTypes.array
+}
+
 
 export default App;
