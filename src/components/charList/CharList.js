@@ -1,77 +1,71 @@
 import "./charList.scss";
-import { Component } from "react";
+import { useState, useEffect, useRef } from "react";
 import MarvelService from "../../services/MarvelService";
 import { beautifulImg } from "../randomChar/RandomChar";
 import ErrorMessage from "../errorMessage/errorMesage";
 import Spinner from "../spinner/spinner"
 
 
-class CharList extends Component {
-  state = {
-    char: [],
-    error: null,
-    spinner: true,
-    offset: 1550,
-    newItem: false,
-    charEnded: false
-  };
+const CharList = (props) => {
+  const [char, setChar] = useState([])
+  const [error, setError] = useState(null)
+  const [spinner, setSpinner] = useState(true)
+  const [offset, setOffset] = useState(1550)
+  const [newItem, setNewItem] = useState(false)
+  const [charEnded, setCharEnded] = useState(false)
+  
+  const marvelService = new MarvelService();
+  const myRef = useRef([])
 
-  marvelService = new MarvelService();
-  myRef = []
+  
 
-  setRef = elem => {
-    this.myRef.push(elem)
+  useEffect(() => {
+    onUpdateChar()
+  }, [])
+
+
+  const onUpdateChar = (offset) => {
+    setNewItem(true)
+    marvelService
+        .getAllCharacters(offset)
+        .then(onCharLoaded)
+        .catch(onErrorLoaded)
   }
 
-  onSetRef = (i) => {
-    console.log(this.myRef)
-    this.myRef.forEach(item => {
+  const onCharLoaded = (newChar) => {
+    if(newChar.length < 9){
+      setCharEnded(true)
+    }
+    setChar(char => [...char, ...newChar])
+    setSpinner(null)
+    setNewItem(false)
+    setOffset(offset => offset + 9)
+  };
+
+  const onErrorLoaded = (error) => {
+    setError(error)
+    setSpinner(null)
+  }
+
+  const onSetRef = (i) => {
+    myRef.current.forEach(item => {
       item.classList.remove('char__item_selected')
     })
-    this.myRef[i].classList.add('char__item_selected')
+    myRef.current[i].classList.add('char__item_selected')
   }
 
-  componentDidMount() {
-    this.onUpdateChar()
-  }
-
-  onUpdateChar = (offset) => {
-    this.setState({newItem:true})
-    this.marvelService
-        .getAllCharacters(offset)
-        .then(this.onCharLoaded)
-        .catch(this.onErrorLoaded)
-  }
-
-  onCharLoaded = (newChar) => {
-    if(newChar.length < 9){
-      this.setState({charEnded:true})
-    }
-    this.setState(({char, offset}) => ({
-      char:[...char, ...newChar],
-      spinner: null,
-      newItem: false,
-      offset: offset + 9
-    }));
-  };
-
-  onErrorLoaded = (error) => {
-    this.setState({error, spinner:null})
-  }
-
-  list = () => {
-    const {char, offset, newItem, charEnded} = this.state
+  const list = () => {
     return (
       <div className="char__list">
           <ul className="char__grid">
               {char.map((item,i) =>{
                   return(
                       <li
-                      ref = {this.setRef} 
+                      ref = {el => myRef.current[i] = el}
                       key={item.id} 
                       onClick={() => {
-                        this.props.onCharSelected(item.id)
-                        this.onSetRef(i)
+                        props.onCharSelected(item.id)
+                        onSetRef(i)
                       } } 
                       className="char__item">
                           <img  src={item.thumbnail} alt="abyss" style={beautifulImg(item.thumbnail)} />
@@ -80,28 +74,25 @@ class CharList extends Component {
                   )
               } )}
           </ul>
-          <button style={{'display': charEnded ? 'none' : 'block'}} disabled={newItem} onClick={() => this.onUpdateChar(offset)} className="button button__main button__long">
+          <button style={{'display': charEnded ? 'none' : 'block'}} disabled={newItem} onClick={() => onUpdateChar(offset)} className="button button__main button__long">
             <div className="inner">load more</div>
           </button>
         </div>
     )
   }
 
-  render() {
     
-    const { error, spinner } = this.state;
-    const newList = this.list()
+    const newList = list()
     const errorMes = error ? <ErrorMessage/> : null
     const spinnerMes = spinner ? <Spinner/> : null
-    const list = !(error || spinner) ? newList : null
+    const listt = !(error || spinner) ? newList : null
     return (
       <>
         {errorMes}
         {spinnerMes}
-        {list}
+        {listt}
       </>
     );
-  }
 }
 
 
