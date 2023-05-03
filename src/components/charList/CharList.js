@@ -1,6 +1,6 @@
 import "./charList.scss";
 import { useState, useEffect, useRef } from "react";
-import MarvelService from "../../services/MarvelService";
+import useMarvelService from "../../services/MarvelService";
 import { beautifulImg } from "../randomChar/RandomChar";
 import ErrorMessage from "../errorMessage/errorMesage";
 import Spinner from "../spinner/spinner"
@@ -8,28 +8,22 @@ import Spinner from "../spinner/spinner"
 
 const CharList = (props) => {
   const [char, setChar] = useState([])
-  const [error, setError] = useState(null)
-  const [spinner, setSpinner] = useState(true)
-  const [offset, setOffset] = useState(1550)
+  const [offset, setOffset] = useState(1450)
   const [newItem, setNewItem] = useState(false)
   const [charEnded, setCharEnded] = useState(false)
   
-  const marvelService = new MarvelService();
+  const {loading, error, getAllCharacters} =  useMarvelService();
   const myRef = useRef([])
 
-  
-
   useEffect(() => {
-    onUpdateChar()
+    onUpdateChar(offset, true)
   }, [])
 
 
-  const onUpdateChar = (offset) => {
-    setNewItem(true)
-    marvelService
-        .getAllCharacters(offset)
+  const onUpdateChar = (offset, initial) => {
+    initial ? setNewItem(false) : setNewItem(true)
+    getAllCharacters(offset)
         .then(onCharLoaded)
-        .catch(onErrorLoaded)
   }
 
   const onCharLoaded = (newChar) => {
@@ -37,15 +31,11 @@ const CharList = (props) => {
       setCharEnded(true)
     }
     setChar(char => [...char, ...newChar])
-    setSpinner(null)
+    //setSpinner(null)
     setNewItem(false)
     setOffset(offset => offset + 9)
   };
 
-  const onErrorLoaded = (error) => {
-    setError(error)
-    setSpinner(null)
-  }
 
   const onSetRef = (i) => {
     myRef.current.forEach(item => {
@@ -56,7 +46,6 @@ const CharList = (props) => {
 
   const list = () => {
     return (
-      <div className="char__list">
           <ul className="char__grid">
               {char.map((item,i) =>{
                   return(
@@ -74,24 +63,23 @@ const CharList = (props) => {
                   )
               } )}
           </ul>
-          <button style={{'display': charEnded ? 'none' : 'block'}} disabled={newItem} onClick={() => onUpdateChar(offset)} className="button button__main button__long">
-            <div className="inner">load more</div>
-          </button>
-        </div>
+          
     )
   }
 
     
     const newList = list()
     const errorMes = error ? <ErrorMessage/> : null
-    const spinnerMes = spinner ? <Spinner/> : null
-    const listt = !(error || spinner) ? newList : null
+    const spinnerMes = loading && !newItem ? <Spinner/> : null
     return (
-      <>
+      <div className="char__list">
         {errorMes}
         {spinnerMes}
-        {listt}
-      </>
+        {newList}
+        <button style={{'display': charEnded ? 'none' : 'block'}} disabled={newItem} onClick={() => onUpdateChar(offset)} className="button button__main button__long">
+            <div className="inner">load more</div>
+          </button>
+        </div>
     );
 }
 
