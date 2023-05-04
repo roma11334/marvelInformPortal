@@ -27,13 +27,18 @@ const CharList = (props) => {
   }
 
   const onCharLoaded = (newChar) => {
+    let ended = false;
     if(newChar.length < 9){
+      ended = true
       setCharEnded(true)
     }
+    if (char.length < 9){
+      setChar([])
+    }
     setChar(char => [...char, ...newChar])
-    //setSpinner(null)
     setNewItem(false)
     setOffset(offset => offset + 9)
+    setCharEnded(charEnded => ended);
   };
 
 
@@ -44,14 +49,14 @@ const CharList = (props) => {
     myRef.current[i].classList.add('char__item_selected')
   }
 
-  const list = () => {
+  const list = (charList) => {
     return (
           <ul className="char__grid">
-              {char.map((item,i) =>{
+              {charList.map((item,i) =>{
                   return(
                       <li
                       ref = {el => myRef.current[i] = el}
-                      key={item.id} 
+                      key={i} 
                       onClick={() => {
                         props.onCharSelected(item.id)
                         onSetRef(i)
@@ -65,10 +70,11 @@ const CharList = (props) => {
           </ul>
           
     )
+    
   }
 
     
-    const newList = list()
+    const newList = list(char)
     const errorMes = error ? <ErrorMessage/> : null
     const spinnerMes = loading && !newItem ? <Spinner/> : null
     return (

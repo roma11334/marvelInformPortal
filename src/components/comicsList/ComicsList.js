@@ -10,19 +10,23 @@ const ComicsList = () => {
     const [offset, setOffset] = useState(210)
     const {getComics, loading, error, clearError} = useMarvelService()
 
+    useEffect(() => {
+        updateComics()
+    },[])
+
     const updateComics = () => {
         clearError()
         getComics(offset).then(updateChar)
     }
 
     const updateChar = (newChar) => {
+        if(char.length < 8){
+            setChar([])
+        }
         setChar(char => [...char, ...newChar])
-        setOffset(offset + 8)
+        setOffset(offset => offset + 8)
     }
-
-    useEffect(() => {
-        updateComics()
-    },[])
+    
     console.log('comics list')
     const list = () => {
         return(
