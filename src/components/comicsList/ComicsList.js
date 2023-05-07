@@ -3,11 +3,13 @@ import useMarvelService from '../../services/MarvelService';
 import { useEffect, useState } from 'react';
 import Spinner from '../spinner/spinner';
 import ErrorMessage from '../errorMessage/errorMesage';
+import { Link } from 'react-router-dom';
 
 const ComicsList = () => {
 
     const [char, setChar] = useState([])
     const [offset, setOffset] = useState(210)
+    
     const {getComics, loading, error, clearError} = useMarvelService()
 
     useEffect(() => {
@@ -26,8 +28,6 @@ const ComicsList = () => {
         setChar(char => [...char, ...newChar])
         setOffset(offset => offset + 8)
     }
-    
-    console.log('comics list')
     const list = () => {
         return(
             <ul className="comics__grid">
@@ -35,11 +35,11 @@ const ComicsList = () => {
                     const {id, title, price, thumbnail} = item
                     return (
                     <li className="comics__item" key={i}>
-                        <a href="#">
+                        <Link to={`/comics/${id}`}>
                             <img src={thumbnail} alt="ultimate war" className="comics__item-img"/>
                             <div className="comics__item-name">{title}</div>
                             <div className="comics__item-price">{price}$</div>
-                        </a>
+                        </Link>
                     </li>
                     )  
                 })}

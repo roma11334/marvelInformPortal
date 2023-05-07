@@ -23,11 +23,18 @@ const useMarvelService = () => {
     return res.data.results.map(transformComics)
   }
 
+  const getOneComics = async (id) => {
+    const res = await request(`https://gateway.marvel.com:443/v1/public/comics/${id}?${_apiKey}`)
+    return transformComics(res.data.results[0])
+  }
+
   const transformComics = (char) => {
     return {
       id:char.id,
       title:char.title,
+      desc:char.description || 'This comic have no description',
       price:char.prices[0].price,
+      page:char.pageCount,
       thumbnail:char.thumbnail.path + '.' + char.thumbnail.extension
     }
   }
@@ -44,7 +51,7 @@ const useMarvelService = () => {
     }
   }
 
-  return {getAllCharacters, getCharacter, loading, error, clearError, getComics}
+  return {getAllCharacters, getCharacter, loading, error, clearError, getComics, getOneComics}
 }
 
 export default useMarvelService;
