@@ -4,6 +4,7 @@ import useMarvelService from "../../services/MarvelService";
 import { beautifulImg } from "../randomChar/RandomChar";
 import ErrorMessage from "../errorMessage/errorMesage";
 import Spinner from "../spinner/spinner"
+import {CSSTransition,TransitionGroup} from 'react-transition-group';
 
 
 const CharList = (props) => {
@@ -52,21 +53,28 @@ const CharList = (props) => {
   const list = (charList) => {
     return (
           <ul className="char__grid">
-              {charList.map((item,i) =>{
+            <TransitionGroup component={null}>
+              {charList.map((item,i) => {
                   return(
-                      <li
-                      ref = {el => myRef.current[i] = el}
-                      key={i} 
-                      onClick={() => {
-                        props.onCharSelected(item.id)
-                        onSetRef(i)
-                      } } 
-                      className="char__item">
-                          <img  src={item.thumbnail} alt="abyss" style={beautifulImg(item.thumbnail)} />
-                          <div className="char__name">{item.name}</div>
-                      </li>
+                    <CSSTransition
+                      timeout={(i * 300)}
+                      classNames="item"
+                      key = {i}>
+                        <li
+                          ref = {el => myRef.current[i] = el}
+                          key={i} 
+                          onClick={() => {
+                            props.onCharSelected(item.id)
+                            onSetRef(i)
+                          } } 
+                          className="char__item">
+                            <img  src={item.thumbnail} alt="abyss" style={beautifulImg(item.thumbnail)} />
+                            <div className="char__name">{item.name}</div>
+                        </li>
+                    </CSSTransition>
                   )
               } )}
+            </TransitionGroup>
           </ul>
           
     )
