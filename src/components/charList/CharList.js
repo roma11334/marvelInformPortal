@@ -1,5 +1,5 @@
 import "./charList.scss";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import useMarvelService from "../../services/MarvelService";
 import { beautifulImg } from "../randomChar/RandomChar";
 import ErrorMessage from "../errorMessage/errorMesage";
@@ -95,12 +95,14 @@ const CharList = (props) => {
           </ul>
           
     )
-    
   }
+    const elements = useMemo(() => {
+      return setContent(process, () => list(char), newItem)
+    }, [process])
 
     return (
       <div className="char__list">
-        {setContent(process, () => list(char), newItem)}
+        {elements}
         <button style={{'display': charEnded ? 'none' : 'block'}} disabled={newItem} onClick={() => onUpdateChar(offset)} className="button button__main button__long">
             <div className="inner">load more</div>
           </button>

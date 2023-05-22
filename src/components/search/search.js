@@ -22,7 +22,7 @@ const Search = () => {
     return errors
   }
 
-  const {loading, error, getNameCharacter} = useMarvelService()
+  const {getNameCharacter} = useMarvelService()
 
   const onSearch = (values) => {
     getNameCharacter(values.name)
@@ -64,7 +64,6 @@ const Search = () => {
         <button type='submit' className='button button__main'>
           <div className="inner">FIND</div>
         </button>
-        {/* <ErrorMessage name="name" style={{'color':'red'}} component="div"/> */}
         <div className='topage'>
           {status ? <h3 style={{'color':`${color}`}} className='status'>{status}</h3> : null}
           {id ? 
