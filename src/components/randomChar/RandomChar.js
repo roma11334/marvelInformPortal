@@ -4,11 +4,12 @@ import { useState, useEffect } from 'react';
 import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/spinner';
 import ErrorMessage from '../errorMessage/errorMesage';
+import setContent from '../../utils/setContent';
 
 const RandomChar = () => {
     
     const [char, setChar] = useState({})
-    const {loading, error, getCharacter, clearError} = useMarvelService() 
+    const {loading, error, getCharacter, clearError, process, setProcess} = useMarvelService() 
     
     useEffect(() => {
         updateChar()
@@ -27,16 +28,16 @@ const RandomChar = () => {
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
         getCharacter(id)
             .then(onCharLoaded)
+            .then(() => setProcess('confirmed'))
     }
 
+   
         const errorMesage = error ? <ErrorMessage/> : null
         const loadingMessage = loading ? <Spinner/> : null
         const charMessage = !(loading || error) ? <View char={char}/> : null
         return (
             <div className="randomchar">
-                {errorMesage}
-                {loadingMessage}
-                {charMessage}
+                {setContent(process, View, char)}
                 <div className="randomchar__static">
                     <p className="randomchar__title">
                         Random character for today!<br/>
@@ -72,8 +73,8 @@ const beautifulImg = (img) => {
     }
 }
 
-const View = ({char}) => {
-    const {name, description, thumbnail, homepage, wiki} = char
+const View = ({data}) => {
+    const {name, description, thumbnail, homepage, wiki} = data
     const newDesc = beautifulDesc(description)
     return (
         <div className="randomchar__block">

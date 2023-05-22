@@ -1,17 +1,15 @@
 import './charInfo.scss';
 import { useState, useEffect } from 'react';
 import useMarvelService from '../../services/MarvelService';
-import ErrorMessage from '../errorMessage/errorMesage';
-import Spinner from '../spinner/spinner';
-import Skeleton from '../skeleton/Skeleton'
 import { beautifulDesc } from '../randomChar/RandomChar';
 import { beautifulImg } from '../randomChar/RandomChar';
 import PropTypes from 'prop-types';
+import setContent from '../../utils/setContent';
 
 const CharInfo = (props) => {
     const [char, setChar] = useState(null)
 
-    const {loading, error, getCharacter, clearError} = useMarvelService()
+    const {getCharacter, clearError, process, setProcess} = useMarvelService()
 
     const updateChar = () => {
         if(!props.charId){
@@ -20,7 +18,8 @@ const CharInfo = (props) => {
         clearError()
         getCharacter(props.charId)
             .then(onCharLoaded)
-    }
+            .then(() => setProcess('confirmed'))
+    } 
     
     useEffect(() => {
         updateChar()
@@ -30,23 +29,16 @@ const CharInfo = (props) => {
     const onCharLoaded = (char) => {
         setChar(char)
       };
-    
-        const skeleton = (char || loading || error) ? null : <Skeleton/>
-        const loadingMsg = loading ? <Spinner/> : null
-        const errorMsg = error ? <ErrorMessage /> : null
-        const content = (loading || error || !char) ? null : <View char={char} />
+
         return (
             <div className="char__info">
-                {skeleton}
-                {loadingMsg}
-                {content}
-                {errorMsg}
+                {setContent(process, View, char)}
             </div>
         )
 }
 
-const View = ({char}) => {
-    const {name, description, homepage, wiki, thumbnail, comics} = char
+const View = ({data}) => {
+    const {name, description, homepage, wiki, thumbnail, comics} = data
     const newDesc = beautifulDesc(description)  //Если описание слишком длинное мы его обрезаем
     return (
         <>

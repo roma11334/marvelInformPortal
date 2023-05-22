@@ -7,13 +7,29 @@ import Spinner from "../spinner/spinner"
 import {CSSTransition,TransitionGroup} from 'react-transition-group';
 
 
+const setContent = (process, Component, newItem) => {
+  switch(process) {
+      case 'waiting':
+          return <Spinner/>
+      case 'error':
+          return <ErrorMessage/>
+      case 'loading':
+          return newItem ? <Component/> : <Spinner/>
+      case 'confirmed':
+          return <Component/>
+      default:
+          throw new Error('Unexpected process state')
+  }
+}
+
+
 const CharList = (props) => {
   const [char, setChar] = useState([])
   const [offset, setOffset] = useState(1450)
   const [newItem, setNewItem] = useState(false)
   const [charEnded, setCharEnded] = useState(false)
   
-  const {loading, error, getAllCharacters} =  useMarvelService();
+  const {getAllCharacters, process, setProcess} =  useMarvelService();
   const myRef = useRef([])
 
   useEffect(() => {
@@ -25,6 +41,7 @@ const CharList = (props) => {
     initial ? setNewItem(false) : setNewItem(true)
     getAllCharacters(offset)
         .then(onCharLoaded)
+        .then(() => setProcess('confirmed'))
   }
 
   const onCharLoaded = (newChar) => {
@@ -81,15 +98,9 @@ const CharList = (props) => {
     
   }
 
-    
-    const newList = list(char)
-    const errorMes = error ? <ErrorMessage/> : null
-    const spinnerMes = loading && !newItem ? <Spinner/> : null
     return (
       <div className="char__list">
-        {errorMes}
-        {spinnerMes}
-        {newList}
+        {setContent(process, () => list(char), newItem)}
         <button style={{'display': charEnded ? 'none' : 'block'}} disabled={newItem} onClick={() => onUpdateChar(offset)} className="button button__main button__long">
             <div className="inner">load more</div>
           </button>
